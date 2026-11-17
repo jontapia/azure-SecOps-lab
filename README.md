@@ -115,19 +115,6 @@ flowchart LR
 
 <!-- If you also reset mlopez's password as jontapia.t1, add a 4724 row for it. Right now the logs only show the unlock by jontapia.t1. -->
 
-## Deploy
-
-You need an Azure subscription where you're Owner. It fits on the free trial (4-vCPU cap). `deploy.sh` checks each VM size against Azure before deploying and uses the first one that has capacity, because my trial couldn't use East US at all.
-
-```bash
-# Azure Cloud Shell (Bash)
-git clone https://github.com/jontapia/jontapia-azure-secops-lab.git
-cd jontapia-azure-secops-lab
-chmod +x deploy.sh teardown.sh
-LOCATION=westus2 ./deploy.sh
-```
-
-The script checks your quota, registers providers, looks up the built-in policy IDs, generates the admin password and deploys. It takes **30–40 minutes**, mostly Bastion and the AD promotion.
 
 ## Incident → ticket walkthrough
 
