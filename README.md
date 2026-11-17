@@ -1,7 +1,5 @@
 # Azure Hybrid Identity & SecOps Lab
 
-Jonathan Tapia · AZ-104 · CompTIA A+ / Network+ / Security+
-
 My [first Azure lab](https://github.com/jontapia/jontapia-az104-lab) covered the basics. Before starting AZ-500, my next cert, I wanted to see if I had the concept of building a secure environment or at least an environment that has secure features: So this labs covers what it looks like when an attack hits a users account/identity, and how to resolve that incident properly.
 So this lab runs an Active Directory domain in Azure with no public IPs on any server, sends the Windows Security logs to Microsoft Sentinel, and has detection rules for brute force, lockouts and privilege escalation. Then I attack my own test account, watch the incident open in Sentinel, and fix it with a Tier 1 account that can only unlock and reset users, I learned a lot during this lab and it help me solidify my understanding with Azure better
 
