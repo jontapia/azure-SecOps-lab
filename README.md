@@ -2,11 +2,9 @@
 
 Jonathan Tapia · AZ-104 · CompTIA A+ / Network+ / Security+
 
-My [first Azure lab](https://github.com/jontapia/jontapia-az104-lab) covered the basics. Before starting AZ-500, my next cert, I wanted to see a question play out for real: what does it look like when an attack actually hits an identity, and how does the help desk handle it?
+My [first Azure lab](https://github.com/jontapia/jontapia-az104-lab) covered the basics. Before starting AZ-500, my next cert, I wanted to see if I had the concept of building a secure environment or at least an environment that has secure features: So this labs covers what it looks like when an attack hits a users account/identity, and how to resolve that incident properly.
+So this lab runs an Active Directory domain in Azure with no public IPs on any server, sends the Windows Security logs to Microsoft Sentinel, and has detection rules for brute force, lockouts and privilege escalation. Then I attack my own test account, watch the incident open in Sentinel, and fix it with a Tier 1 account that can only unlock and reset users, I learned a lot during this lab and it help me solidify my understanding with Azure better
 
-So this lab runs an Active Directory domain in Azure with no public IPs on any server, sends the Windows Security logs to Microsoft Sentinel, and has detection rules for brute force, lockouts and privilege escalation. Then I attack my own test account, watch the incident open in Sentinel, and fix it with a Tier 1 account that can only unlock and reset users.
-
-It's built in Bicep, with two PowerShell scripts that promote the domain controller and join the member server, so I can rebuild the whole thing instead of redoing it by hand.
 
 ## Architecture
 
@@ -66,13 +64,12 @@ flowchart LR
 
 ## Why I built it this way
 
-- **No public IPs on servers, enforced by policy as well as design.** Bastion is the only entry point, and the NSG only accepts RDP from the Bastion subnet. Even an Owner who tries to attach a public IP to a NIC gets denied by Azure Policy.
-- **Tiered admin accounts.** Daily help desk work happens as `jontapia.t1`, which can reset and unlock accounts and nothing else. Domain admin is a separate account whose password lives only in Key Vault.
+- **No public IPs on servers, enforced by policy as well as design.** Bastion is the only entry point, and the NSG only accepts RDP from the Bastion subnet. Even an Owner who tries to attach a public IP to a NIC gets denied by Azure Policy, this helps secure the servers and makes sure that no malicious actor can get it and also if a account with elevated permission were to get compromised then they still wouldn't be able to do all actions.
+- **Tiered admin accounts.** Daily help desk work happens as `jontapia.t1`, which can reset and unlock accounts and nothing else which is what permission would look like in real world, although with some other low level permission added to it. Domain admin is a separate account whose password lives only in Key Vault which is best practice for Azure.
 - **Delegation through ACLs, not group nesting.** Tier 1 gets `Reset Password` plus `lockoutTime`/`pwdLastSet` write rights on one OU, applied with `dsacls`. They're **not** in Account Operators, which would be far too broad.
-- **Detection before resolution.** The lockout policy and the Sentinel rules are designed together. Five bad passwords lock the account and open a Sentinel incident, so the tech has evidence before unlocking anything.
+- **Detection before resolution.** The lockout policy and the Sentinel rules are designed together. Five bad passwords lock the account and open a Sentinel incident, so the tech has evidence before unlocking anything which will notify me, so this is really useful to see if there is anything going on in with your servers/domain and can possibly catch bad actors before they get even more access.
 - **The DC is built for Azure.** Static private IP, AD database on a data disk with caching set to None, and the VNet's DNS pointing at the DC. The DC forwards to Azure DNS (168.63.129.16) so private endpoint names resolve to private IPs.
-- **Storage with no public surface.** Public network access is off and shared-key auth is off, so even a leaked key wouldn't work.
-- **Minimal log ingestion.** The data collection rule takes only the 9 event IDs the detections need, not the whole Security log.
+- **Storage with no public surface.** Public network access is off and shared-key auth is off, so even a leaked key wouldn't work, which is important for obvious reasons but also can help with compliaance if your company demands it.
 
 ### Where I cut corners for the lab
 
@@ -144,13 +141,6 @@ The script checks your quota, registers providers, looks up the built-in policy 
 8. **Policy check.** In the portal, try to attach a public IP to `jt-srv01-nic`. The request is denied by policy `JT Lab: VM network interfaces may not have public IPs`.
 9. **Restore drill.** Run an on-demand backup of `JT-SRV01`, delete a file, and recover it with **File Recovery**.
 
-## Cost & teardown
-
-Bastion bills every hour it exists, **even with the VMs off**. Deploy, run the walkthrough and tear down the same day.
-
-```bash
-./teardown.sh   # stops backups, deletes everything, purges the Key Vault
-```
 
 ## Repo layout
 
