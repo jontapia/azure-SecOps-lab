@@ -89,8 +89,8 @@ flowchart LR
 - **Bastion sign-in:** `JONTAPIA\jontapia` failed. The UPN format `jontapia@corp.jontapia.lab` worked.
 - **First login mistake:** I signed in with the local `jontapia` account, and ADUC refused to open. Signing in with the domain account fixed it.
 - **Detection time:** failed logons started at 9:50 PM; Sentinel created the incident at 9:57 PM, about **7 minutes**.
-- **Unexpected:** the Sentinel incident opened in the **Microsoft Defender portal**, not just the Azure portal.
-- **Unexpected #2:** I set backup soft delete to *Disabled* in the template, but teardown still triggered a "Delete Backup data" alert saying the data would be kept for 14 days (screenshot 10). The soft delete setting I deployed didn't take effect the way I expected. Something to check before relying on it.
+- **Unexpected:** the Sentinel incident opened in the **Microsoft Defender portal**, not just the Azure portal, which is what Azure wants from now on.
+- **Unexpected #2:** I set backup soft delete to *Disabled* in the template, but teardown still triggered a "Delete Backup data" alert saying the data would be kept for 14 days (screenshot 10). The soft delete setting I deployed didn't take effect the way I expected. Which is something im currently studying to understand better because that really caught me up for a second.
 
 ## Proof it ran
 
