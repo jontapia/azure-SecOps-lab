@@ -129,20 +129,4 @@ flowchart LR
 9. **Restore drill.** Run an on-demand backup of `JT-SRV01`, delete a file, and recover it with **File Recovery**.
 
 
-## Repo layout
 
-```
-main.bicep                 orchestration
-modules/
-  network.bicep            hub-spoke, NSG, Bastion, private DNS zone
-  compute.bicep            DC + member server, run commands, AMA, auto-shutdown
-  security.bicep           Log Analytics, Sentinel, DCR, analytics rules, alerts
-  keyvault.bicep           RBAC Key Vault + generated admin secret
-  storage.bicep            private-endpoint-only storage account
-  governance.bicep         Azure Policy assignments
-  backup.bicep             Recovery Services vault + policy
-scripts/
-  dc-promote.ps1           data disk, forest creation, post-config (OUs, users, delegation, auditing)
-  member-join.ps1          RSAT install, wait-for-DC, domain join
-deploy.sh / teardown.sh
-```
